@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MvcMovie.Data;
+
 namespace MvcMovie
 {
     public class Program
@@ -6,6 +10,10 @@ namespace MvcMovie
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<MvcMovieContext>(Options =>
+            {
+                Options.UseSqlServer(builder.Configuration.GetConnectionString("MvcMovieContext"));
+            });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
