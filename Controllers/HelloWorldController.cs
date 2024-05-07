@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
+/*
+ * 视图模板不应该直接执行业务逻辑或与数据库进行交互。相反，视图模板应该使用控制器所提供的数据。
+ * 可以让控制器将视图模板所需的动态数据放置再视图模板可以稍后访问的viewdata字典
+ * 
+ */
 
 namespace MvcMovie.Controllers
 {
@@ -20,9 +25,11 @@ namespace MvcMovie.Controllers
     //{
     //    return HtmlEncoder.Default.Encode($"Hello {name}, NumTimes is: {numTimes}");
     //}
-    public string Welcome(string name, int ID = 1)
+    public IActionResult Welcome(string name, int numTimes = 1)
         {
-            return HtmlEncoder.Default.Encode($"Hello {name}, ID is: {ID}");
+            ViewData["Message"] = "Hello" + name;
+            ViewData["NumTimes"] = numTimes;
+            return View();
         }
     }
 }
