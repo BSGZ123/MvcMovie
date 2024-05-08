@@ -87,10 +87,11 @@ namespace MvcMovie.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]//防止请求伪造，并与视图文件中生成的防伪标记进行配对。
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price")] Movie movie)
-        {
-            if (id != movie.Id)
+		//限制控制器操作方法接收和绑定的属性，只绑定特定属性，而不是将所有请求数据都绑定到模型。这有助于增强安全性和控制数据流。
+		{
+			if (id != movie.Id)
             {
                 return NotFound();
             }
