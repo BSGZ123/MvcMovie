@@ -20,10 +20,33 @@ namespace MvcMovie.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string movieGenre)
         {
-              return _context.Movie != null ? 
-                          View(await _context.Movie.ToListAsync()) :
+            IQueryable<string> genreQuery = from m in _context.Movie
+                                            orderby m.Genre
+                                            select m.Genre;
+
+            var movies = from m in _context.Movie
+						 select m;
+
+			if (!string.IsNullOrEmpty(searchString))
+			{
+				movies = movies.Where(s => s.Title.Contains(searchString));
+			}
+
+            //if (!string.IsNullOrEmpty(movieGenre))
+            //{
+            //    movies = movies.Where(x => x.Genre == movieGenre);
+            //}
+
+            //var movieGenreVM = new MovieGenreViewModel
+            //{
+            //    Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
+            //    Movies = await movies.ToListAsync()
+            //};
+
+            return _context.Movie != null ? 
+                          View(await movies.ToListAsync()) :
                           Problem("Entity set 'MvcMovieContext.Movie'  is null.");
         }
 
@@ -36,7 +59,7 @@ namespace MvcMovie.Controllers
             }
 
             var movie = await _context.Movie
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);//重要安全功能，代码会先验证搜索方法已经找到电影，然后再执行操作。
             if (movie == null)
             {
                 return NotFound();
@@ -138,9 +161,10 @@ namespace MvcMovie.Controllers
         }
 
         // POST: Movies/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]//向DeleteConfirmed 方法添加 ActionName("Delete") 属性。 该属性对路由系统执行映
+        //射，以便包括 POST 请求的 /Delete/ 的 URL可找到 DeleteConfirmed 方法。
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)//该方法不删除指定的电影，而是返回可在其中提交删除的电影的视图。
         {
             if (_context.Movie == null)
             {
